@@ -8,6 +8,7 @@ authors = ["Yerzhan Aitzhanov <y.aitzhanov@gmail.com>"]
 python = "^3.10"
 fastapi = "^0.99.1"
 alembic = "^1.11.1"
+uvicorn = "^0.22.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
