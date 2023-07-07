@@ -6,6 +6,7 @@ from pydantic import AnyHttpUrl, BaseSettings, validator, PostgresDsn
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Webtronics"
     DEBUG: bool = True
+    SECRET_KEY: str = "BMBSj8^LUa5W+X*gb99!5R2!pX4E#h@ja6hzmXA$kA=%!DV8$S--BEKmzLHT"
     API_ROUTE_STR: str = "api"
     CURRENT_API_VERSION: str = "v1"
     BACKEND_CORS_ORIGINS: Union[str, List[AnyHttpUrl]] = []
@@ -17,6 +18,9 @@ class Settings(BaseSettings):
     DB_NAME: str = "webtronics"
     DB_SCHEME: str = "postgresql+asyncpg"
     DB_URI: Optional[PostgresDsn] = None
+
+    # 60 minutes * 24 hours * 8 days = 8 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(
@@ -41,6 +45,9 @@ class Settings(BaseSettings):
             port=values.get("DB_PORT"),
             path=f"/{values.get('DB_NAME') or ''}",
         )
+
+    class Config:
+        case_sensitive = True
 
 
 settings = Settings()

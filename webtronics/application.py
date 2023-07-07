@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from webtronics.core.config import settings
-from webtronics.api.v1.routes import router
+from webtronics.api.v1.api import router
 
 
 app = FastAPI(

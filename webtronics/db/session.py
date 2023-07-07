@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from webtronics.core.config import settings
 
 
-engine = create_async_engine(settings.DATABASE_URI, pool_pre_ping=True)
+engine = create_async_engine(settings.DB_URI, pool_pre_ping=True)
 
 Session = async_scoped_session(
     session_factory=sessionmaker(
