@@ -13,6 +13,7 @@ class User(CreatedAtUpdatedAtAbstractModel):
     is_superuser = Column(Boolean(), default=False)
 
     users_likes = relationship("UsersLikes", back_populates="user")
+    users_dislikes = relationship("UsersDislikes", back_populates="user")
 
     def __repr__(self):
         return f'<User(id={self.id}, username={self.username})>'
