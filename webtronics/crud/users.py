@@ -11,12 +11,12 @@ from webtronics.schemas.users import UserCreate, UserUpdate
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     async def get_by_email(self, db: AsyncSession, *, email: str) -> Optional[User]:
-        query = select(User).filter(User.email == email)
+        query = select(self.model).filter(User.email == email)
         row = await db.execute(query)
         return row.scalar_one_or_none()
 
     async def create(self, db: AsyncSession, *, obj_in: UserCreate) -> User:
-        db_obj = User(
+        db_obj = self.model(
             email=obj_in.email,
             hashed_password=get_password_hash(obj_in.password),
             username=obj_in.username,
