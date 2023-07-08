@@ -9,7 +9,7 @@ class PostBase(BaseModel):
     description: Optional[str] = None
 
 
-# Properties to receive on item creation
+# Properties to receive on post creation
 class PostCreate(PostBase):
     title: str
 

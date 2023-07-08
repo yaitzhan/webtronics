@@ -17,23 +17,23 @@ async def read_posts(
     current_user: models.User = Depends(get_current_active_user),
 ) -> Any:
     if crud.user.is_superuser(current_user):
-        items = await crud.post.get_multi(db, skip=skip, limit=limit)
+        posts = await crud.post.get_multi(db, skip=skip, limit=limit)
     else:
-        items = await crud.post.get_multi_by_owner(
+        posts = await crud.post.get_multi_by_owner(
             db=db, owner_id=current_user.id, skip=skip, limit=limit
         )
-    return items
+    return posts
 
 
 @router.post("/", response_model=schemas.Post)
 async def create_post(
     *,
     db: AsyncSession = Depends(get_db_session),
-    item_in: schemas.PostCreate,
+    post_in: schemas.PostCreate,
     current_user: models.User = Depends(get_current_active_user),
 ) -> Any:
-    item = await crud.post.create_with_owner(db=db, obj_in=item_in, owner_id=current_user.id)
-    return item
+    post = await crud.post.create_with_owner(db=db, obj_in=post_in, owner_id=current_user.id)
+    return post
 
 
 @router.put("/{pk}/", response_model=schemas.Post)
@@ -41,18 +41,18 @@ async def update_post(
     *,
     db: AsyncSession = Depends(get_db_session),
     pk: int,
-    item_in: schemas.PostUpdate,
+    post_in: schemas.PostUpdate,
     current_user: models.User = Depends(get_current_active_user),
 ) -> Any:
     post = await crud.post.get(db=db, pk=pk)
     if not post:
-        raise HTTPException(status_code=status.HTTP_status.HTTP_404_NOT_FOUND_NOT_FOUND, detail="Item not found")
+        raise HTTPException(status_code=status.HTTP_status.HTTP_404_NOT_FOUND_NOT_FOUND, detail="Post not found")
     if not crud.user.is_superuser(current_user) and (post.owner_id != current_user.id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Not enough permissions"
         )
-    post = await crud.post.update(db=db, db_obj=post, obj_in=item_in)
+    post = await crud.post.update(db=db, db_obj=post, obj_in=post_in)
     return post
 
 
@@ -65,7 +65,29 @@ async def read_post(
 ) -> Any:
     post = await crud.post.get(db=db, pk=pk)
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    return post
+
+
+@router.put("/{pk}/like/", response_model=schemas.Post)
+async def like_post(
+    *,
+    db: AsyncSession = Depends(get_db_session),
+    pk: int,
+    current_user: models.User = Depends(get_current_active_user),
+) -> Any:
+    post = await crud.post.get(db=db, pk=pk)
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+
+    if post.owner_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Post owner can not like his own post"
+        )
+
+    await crud.post.like(db=db, post_id=pk, user_id=current_user.id)
+
     return post
 
 
@@ -78,7 +100,7 @@ async def delete_post(
 ):
     post = await crud.post.get(db=db, pk=pk)
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
     if not crud.user.is_superuser(current_user) and (post.owner_id != current_user.id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Not enough permissions")
     await crud.post.remove(db=db, pk=pk)

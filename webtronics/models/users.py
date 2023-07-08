@@ -1,4 +1,5 @@
 from sqlalchemy import Integer, Boolean, Column, String
+from sqlalchemy.orm import relationship
 
 from webtronics.models.abstract_models import CreatedAtUpdatedAtAbstractModel
 
@@ -10,6 +11,8 @@ class User(CreatedAtUpdatedAtAbstractModel):
     hashed_password = Column(String(128), nullable=False)
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
+
+    users_likes = relationship("UsersLikes", back_populates="user")
 
     def __repr__(self):
         return f'<User(id={self.id}, username={self.username})>'
