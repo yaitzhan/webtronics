@@ -1,6 +1,6 @@
 from typing import List, Union, Optional, Dict, Any
 
-from pydantic import AnyHttpUrl, BaseSettings, validator, PostgresDsn
+from pydantic import AnyHttpUrl, BaseSettings, validator, PostgresDsn, RedisDsn
 
 
 class Settings(BaseSettings):
@@ -24,6 +24,11 @@ class Settings(BaseSettings):
 
     CLEARBIT_API_KEY: str = ""
     CLEARBIT_HOST_URL: str = ""
+
+    EMAIL_HUNT_API_KEY: str = ""
+    EMAIL_HUNT_HOST_URL: str = ""
+
+    REDIS_URL: RedisDsn = "redis://localhost:6379/0"
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(

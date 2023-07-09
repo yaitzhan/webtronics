@@ -1,5 +1,6 @@
 from typing import Generator
 
+import aioredis
 from jose import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -47,3 +48,8 @@ async def get_current_active_user(
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
     return current_user
+
+
+async def get_redis_cache() -> Generator:
+    async with aioredis.from_url(settings.REDIS_URL) as cache_session:
+        yield cache_session

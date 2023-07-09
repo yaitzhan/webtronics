@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Any, Optional
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from webtronics.crud.base import CRUDBase
@@ -30,12 +30,34 @@ class CRUDPost(CRUDBase[Post, PostCreate, PostUpdate]):
         await db.refresh(db_obj)
         return db_obj
 
+    async def get(self, db: AsyncSession, pk: Any) -> Optional[Post]:
+        post_obj = await super().get(db=db, pk=pk)
+        likes = await self.get_likes_count(db=db, post_id=pk)
+        dislikes = await self.get_dislikes_count(db=db, post_id=pk)
+        post_obj.likes = likes
+        post_obj.dislikes = dislikes
+        return post_obj
+
     async def get_multi_by_owner(
         self, db: AsyncSession, *, owner_id: int, skip: int = 0, limit: int = 100
     ) -> List[Post]:
         query = select(self.model).filter(self.model.owner_id == owner_id).offset(skip).limit(limit)
         rows = await db.execute(query)
         return rows.scalars().all()
+
+    async def get_likes_count(
+            self, db: AsyncSession, *, post_id: int
+    ) -> int:
+        query = select(Like).join(UsersLikes).filter(Like.post_id == post_id)
+        likes = await db.scalar(select(func.count()).select_from(query.subquery("c")))
+        return likes
+
+    async def get_dislikes_count(
+            self, db: AsyncSession, *, post_id: int
+    ) -> int:
+        query = select(Dislike).join(UsersDislikes).filter(Dislike.post_id == post_id)
+        dislikes = await db.scalar(select(func.count()).select_from(query.subquery("c")))
+        return dislikes
 
     async def like(
         self, db: AsyncSession, *, post_id: int, user_id: int,

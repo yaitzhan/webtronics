@@ -1,16 +1,20 @@
+import json
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from aioredis import Redis
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from webtronics import models, schemas, crud
-from webtronics.api.deps import get_db_session, get_current_active_user
+from webtronics.api.deps import get_db_session, get_current_active_user, get_redis_cache
+from webtronics.tasks.posts import cache_likes_dislikes
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[schemas.Post])
 async def read_posts(
+    *,
     db: AsyncSession = Depends(get_db_session),
     skip: int = 0,
     limit: int = 100,
@@ -29,10 +33,13 @@ async def read_posts(
 async def create_post(
     *,
     db: AsyncSession = Depends(get_db_session),
+    redis: Redis = Depends(get_redis_cache),
     post_in: schemas.PostCreate,
     current_user: models.User = Depends(get_current_active_user),
 ) -> Any:
     post = await crud.post.create_with_owner(db=db, obj_in=post_in, owner_id=current_user.id)
+    async with redis.client() as conn:
+        await conn.set(str(post.id), json.dumps({"likes": 0, "dislikes": 0}))
     return post
 
 
@@ -71,10 +78,12 @@ async def read_post(
 
 @router.put("/{pk}/like/", response_model=schemas.Post)
 async def like_post(
-    *,
-    db: AsyncSession = Depends(get_db_session),
-    pk: int,
-    current_user: models.User = Depends(get_current_active_user),
+        *,
+        background_tasks: BackgroundTasks,
+        db: AsyncSession = Depends(get_db_session),
+        redis: Redis = Depends(get_redis_cache),
+        pk: int,
+        current_user: models.User = Depends(get_current_active_user),
 ) -> Any:
     post = await crud.post.get(db=db, pk=pk)
     if not post:
@@ -88,13 +97,17 @@ async def like_post(
 
     await crud.post.like(db=db, post_id=pk, user_id=current_user.id)
 
+    background_tasks.add_task(cache_likes_dislikes, db=db, redis=redis, post_id=post.id)
+
     return post
 
 
 @router.put("/{pk}/dislike/", response_model=schemas.Post)
 async def dislike_post(
     *,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
+    redis: Redis = Depends(get_redis_cache),
     pk: int,
     current_user: models.User = Depends(get_current_active_user),
 ) -> Any:
@@ -109,6 +122,8 @@ async def dislike_post(
         )
 
     await crud.post.dislike(db=db, post_id=pk, user_id=current_user.id)
+
+    background_tasks.add_task(cache_likes_dislikes, db=db, redis=redis, post_id=post.id)
 
     return post
 

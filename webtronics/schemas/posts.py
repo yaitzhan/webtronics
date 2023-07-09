@@ -24,6 +24,8 @@ class PostInDBBase(PostBase):
     id: int
     title: str
     owner_id: int
+    likes: int
+    dislikes: int
 
     class Config:
         orm_mode = True
