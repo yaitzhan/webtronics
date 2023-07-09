@@ -37,3 +37,27 @@ class User(UserInDBBase):
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+
+class UserAdditionalBase(BaseModel):
+    full_name: Optional[str]
+    time_zone: Optional[str]
+    city: Optional[str]
+    country: Optional[str]
+    email_status: Optional[str]
+    email_score: Optional[str]
+    email_disposable: Optional[str]
+    email_gibberish: Optional[str]
+
+
+class UserAdditionalCreate(BaseModel):
+    id: int
+
+
+class UserAdditionalUpdate(UserAdditionalBase):
+    pass
+
+
+class UserAdditional(UserAdditionalBase):
+    class Config:
+        orm_mode = True

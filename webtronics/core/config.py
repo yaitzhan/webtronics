@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
+    CLEARBIT_API_KEY: str = ""
+    CLEARBIT_HOST_URL: str = ""
+
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(
             cls,  # noqa

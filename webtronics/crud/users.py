@@ -6,7 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from webtronics.core.security import get_password_hash, verify_password
 from webtronics.crud.base import CRUDBase
 from webtronics.models.users import User, UserAdditional
-from webtronics.schemas.users import UserCreate, UserUpdate
+from webtronics.schemas.users import UserCreate, UserUpdate, UserAdditionalCreate, UserAdditionalUpdate
+
+
+class CRUDUserAdditional(CRUDBase[UserAdditional, UserAdditionalCreate, UserAdditionalUpdate]):
+    async def get_by_user_id(self, db: AsyncSession, *, user_id: int) -> Optional[User]:
+        query = select(self.model).filter_by(user_id=user_id)
+        row = await db.execute(query)
+        return row.scalar_one_or_none()
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -25,8 +32,8 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.add(db_obj)
 
         await db.flush()
-        user_additional = UserAdditional(user_id=db_obj.id)
-        db.add(user_additional)
+        additional = UserAdditional(user_id=db_obj.id)
+        db.add(additional)
 
         await db.commit()
         await db.refresh(db_obj)
@@ -61,3 +68,4 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
 
 user = CRUDUser(User)
+user_additional = CRUDUserAdditional(UserAdditional)
