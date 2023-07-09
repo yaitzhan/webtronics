@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from webtronics.core.security import get_password_hash, verify_password
 from webtronics.crud.base import CRUDBase
-from webtronics.models.users import User
+from webtronics.models.users import User, UserAdditional
 from webtronics.schemas.users import UserCreate, UserUpdate
 
 
@@ -23,6 +23,11 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             is_superuser=obj_in.is_superuser,
         )
         db.add(db_obj)
+
+        await db.flush()
+        user_additional = UserAdditional(user_id=db_obj.id)
+        db.add(user_additional)
+
         await db.commit()
         await db.refresh(db_obj)
         return db_obj

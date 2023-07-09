@@ -23,7 +23,6 @@ class CRUDPost(CRUDBase[Post, PostCreate, PostUpdate]):
         db.add(like_obj)
 
         # create dislike object
-        await db.flush()
         like_obj = Dislike(post_id=db_obj.id)
         db.add(like_obj)
 
