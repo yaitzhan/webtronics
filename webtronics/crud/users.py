@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Union
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from webtronics.core.security import get_password_hash, verify_password
 from webtronics.crud.base import CRUDBase
@@ -22,6 +23,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         row = await db.execute(query)
         return row.scalar_one_or_none()
 
+    def sync_get_by_email(self, db: Session, *, email: str) -> Optional[User]:
+        return db.query(User).filter(User.email == email).first()
+
     async def create(self, db: AsyncSession, *, obj_in: UserCreate) -> User:
         db_obj = self.model(
             email=obj_in.email,
@@ -37,6 +41,18 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
         await db.commit()
         await db.refresh(db_obj)
+        return db_obj
+
+    def sync_create(self, db: Session, *, obj_in: UserCreate) -> User:
+        db_obj = self.model(
+            email=obj_in.email,
+            hashed_password=get_password_hash(obj_in.password),
+            username=obj_in.username,
+            is_superuser=obj_in.is_superuser,
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
         return db_obj
 
     async def update(

@@ -1,5 +1,3 @@
-from typing import Generator
-
 import aioredis
 from jose import jwt
 from fastapi import Depends, HTTPException, status
@@ -17,9 +15,12 @@ reusable_oauth2 = OAuth2PasswordBearer(
 )
 
 
-async def get_db_session() -> Generator:
+async def get_db_session():
     async with Session() as session:
-        yield session
+        try:
+            yield session
+        finally:
+            await session.close()
 
 
 async def get_current_user(
@@ -50,6 +51,6 @@ async def get_current_active_user(
     return current_user
 
 
-async def get_redis_cache() -> Generator:
+async def get_redis_cache():
     async with aioredis.from_url(settings.REDIS_URL) as cache_session:
         yield cache_session

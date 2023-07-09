@@ -1,6 +1,6 @@
 from typing import List, Union, Optional, Dict, Any
 
-from pydantic import AnyHttpUrl, BaseSettings, validator, PostgresDsn, RedisDsn
+from pydantic import AnyHttpUrl, BaseSettings, validator, PostgresDsn, RedisDsn, EmailStr
 
 
 class Settings(BaseSettings):
@@ -53,6 +53,9 @@ class Settings(BaseSettings):
             port=values.get("DB_PORT"),
             path=f"/{values.get('DB_NAME') or ''}",
         )
+
+    FIRST_SUPERUSER: EmailStr = "admin@example.com"
+    FIRST_SUPERUSER_PASSWORD: str = "admin"
 
     class Config:
         case_sensitive = True

@@ -1,19 +1,19 @@
 from asyncio import current_task
-from typing import AsyncGenerator
 
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from webtronics.core.config import settings
 
 
-engine = create_async_engine(settings.DB_URI, pool_pre_ping=True)
+async_engine = create_async_engine(settings.DB_URI, pool_pre_ping=True)
 
 Session = async_scoped_session(
     session_factory=sessionmaker(
         autocommit=False,
         autoflush=False,
-        bind=engine,
+        bind=async_engine,
         expire_on_commit=False,
         class_=AsyncSession
     ),
@@ -21,9 +21,5 @@ Session = async_scoped_session(
 )
 
 
-async def get_db_session() -> AsyncGenerator:
-    async with Session() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+engine = create_engine(settings.DB_URI.replace("+asyncpg", ""), pool_pre_ping=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
