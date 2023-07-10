@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional, Union
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 
 from webtronics.core.security import get_password_hash, verify_password
 from webtronics.crud.base import CRUDBase

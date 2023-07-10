@@ -33,8 +33,8 @@ class Settings(BaseSettings):
             cls,  # noqa
             v: Union[str, List[str]],
     ) -> Union[str, List[str]]:
-        if isinstance(v, str) and not v.startswith('['):
-            return [i.strip() for i in v.split(',')]
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",")]
         if isinstance(v, (list, str)):
             return v
         raise ValueError(v)

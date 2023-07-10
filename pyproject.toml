@@ -19,6 +19,8 @@ SQLAlchemy = "1.4.49"
 httpx = "^0.24.1"
 aioredis = "^2.0.1"
 python-dotenv = "^1.0.0"
+ruff = "^0.0.277"
+flake8-quotes = "^3.3.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -26,3 +28,26 @@ pytest = "^5.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+exclude = [
+    "*/alembic/*",
+    "docs",
+]
+ignore = []
+line-length = 120
+select = [
+    "E",
+    "F",
+    "Q",
+    "W",
+]
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "double"
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = [
+    "F401",
+    "F403",
+]

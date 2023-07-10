@@ -16,6 +16,6 @@ async def init_db() -> None:
             await crud.user.create(db, obj_in=user_in)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import asyncio
     asyncio.run(init_db())

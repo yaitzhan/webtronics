@@ -38,6 +38,6 @@ class UserAdditional(CreatedAtUpdatedAtAbstractModel):
     email_gibberish = Column(Boolean, nullable=True)
 
     user = relationship("User", back_populates="additional")
-    
+
     def __repr__(self):
         return f"<UserAdditional(id={self.id}"
