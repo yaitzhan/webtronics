@@ -10,7 +10,7 @@ from webtronics.integrations.emailhunt.schemas import EmailHuntResponse
 
 class EmailHuntClient:
     auth = QueryApiKey(api_key=settings.EMAIL_HUNT_API_KEY)
-    base_url = settings.EMAIL_HUNT_HOST_URL
+    base_url = "https://api.hunter.io/"
 
     timeout = 60
 

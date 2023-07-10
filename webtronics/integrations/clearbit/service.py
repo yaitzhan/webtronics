@@ -10,7 +10,7 @@ from webtronics.integrations.clearbit.schemas import ClearbitResponse
 
 class ClearbitClient:
     auth = BearerApiKey(api_key=settings.CLEARBIT_API_KEY)
-    base_url = settings.CLEARBIT_HOST_URL
+    base_url = "https://person.clearbit.com/"
 
     timeout = 60
 

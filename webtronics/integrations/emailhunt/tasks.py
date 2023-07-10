@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import crud
+from webtronics import crud
 from webtronics.integrations.emailhunt.service import EmailHuntClient
 
 

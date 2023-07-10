@@ -9,11 +9,11 @@ from webtronics.core.config import settings
 
 
 def get_db_url():
-    user = settings.DB_USER
-    password = settings.DB_PASSWORD
-    host = settings.DB_HOST
-    port = settings.DB_PORT
-    db = settings.DB_NAME
+    user = settings.POSTGRES_USER
+    password = settings.POSTGRES_PASSWORD
+    host = settings.POSTGRES_HOST
+    port = settings.POSTGRES_PORT
+    db = settings.POSTGRES_DB
     return f'postgresql://{user}:{password}@{host}:{port}/{db}'
 
 

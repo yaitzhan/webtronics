@@ -437,6 +437,17 @@ checkqa-mypy = ["mypy (==v0.761)"]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
+name = "python-dotenv"
+version = "1.0.0"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[[package]]
 name = "python-jose"
 version = "3.3.0"
 description = "JOSE implementation in Python"
@@ -573,7 +584,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "2607c55e2d7d3ad9e81086edbd7fa74d4abe6a915c53ff4eaca89fd9ea4fab40"
+content-hash = "9105283e57de8c0d4c7bd2ddffbc6b8ed71adfb4812dd572f8fdc6066b2ee68b"
 
 [metadata.files]
 aioredis = [
@@ -665,6 +676,7 @@ pydantic = [
     {file = "pydantic-1.9.0.tar.gz", hash = "sha256:742645059757a56ecd886faf4ed2441b9c0cd406079c2b4bee51bcc3fbcd510a"},
 ]
 pytest = []
+python-dotenv = []
 python-jose = []
 python-multipart = []
 rsa = []

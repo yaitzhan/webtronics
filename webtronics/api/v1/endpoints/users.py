@@ -17,5 +17,5 @@ async def read_users(
     limit: int = 100,
     current_user: models.User = Depends(get_current_active_user),
 ) -> Any:
-    users = crud.user.get_multi(db, skip=skip, limit=limit)
+    users = await crud.user.get_multi(db, skip=skip, limit=limit)
     return users
